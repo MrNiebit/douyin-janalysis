@@ -47,7 +47,8 @@
 </head>
 <script>
     $(function() {
-        var baseUrl = "http://127.0.0.1:8888";
+        // var baseUrl = "http://127.0.0.1:8888";
+        var baseUrl = "http://api.lacknb.cn";
         $.ajaxSetup({
            beforeSend: (xhr, settings) => {
                settings.url = baseUrl + settings.url;
@@ -72,21 +73,23 @@
                 data: {'url': url},
                 success: function(data) {
                     console.log(data)
-                    let prefix = `
-                        <a href="` + data.url + `" target="_blank">`;
+                    // let prefix = `
+                    //     <a href="` + data.url + `" target="_blank">`;
                     let music = `
                         背景音乐：<p><a href="` + data.music + `" target="_blank"> ` + data.music + ` </a></p>
                     `;
                     let suffix = `
-                                 <p>` + data.desc + `</p></a>`;
+                                 <a href="` + data.url[0] + `" target="_blank"><p>` + data.desc + `</p></a>`;
                     
                     var body = '';
-                    data.pic.forEach(pic => {
+                    var pics = data.pic;
+                    var urls = data.url;
+                    for(let i = 0; i < pics.length; i++) {
                         body += `
-                        <img src="` + pic + `" /> </br>
+                        <a href="` + urls[i] + `" target="_blank"><img src="` + pics[i] + `" /></a> </br>
                         `
-                    });
-                    $('#content').html(prefix + body + suffix + music)
+                    };
+                    $('#content').html(body + suffix + music)
                 }
             })
         });
