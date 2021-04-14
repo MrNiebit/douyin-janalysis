@@ -10,6 +10,12 @@ import re
 
 class MainHandler(tornado.web.RequestHandler):
 
+    def set_default_headers(self):
+        self.set_header("Access-Control-Allow-Origin", self.request.headers['Origin'])
+        self.set_header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS, DELETE, PUT')
+        self.set_header("Access-Control-Allow-Headers", "x-requested-with")
+        self.set_header("Access-Control-Allow-Credentials", "true")
+
     def __init__(self, application, request, **kwargs):
         super().__init__(application, request, **kwargs)
         self.headers = {
@@ -22,6 +28,10 @@ class MainHandler(tornado.web.RequestHandler):
     def data_received(self, chunk):
         pass
 
+    def options(self):
+        self.set_status(200)
+        self.finish()
+
     def get_video_id(self, url):
         mid = url.split('/')[5]
         print("mid ----> " + mid)
@@ -32,10 +42,18 @@ class MainHandler(tornado.web.RequestHandler):
         print('api_url ---> ' + self.api_url % mid)
         info = json_data['item_list'][0]
         video = {}
-        video['pic'] = info['video']['cover']['url_list'][0]
         video['desc'] = info['desc']
-        real_url = info['video']['play_addr']['url_list'][0]
-        video['url'] = real_url.replace('playwm', 'play')
+        video['pic'] = []
+        video['url'] = []
+        if info['images'] == None:
+            video['pic'].append(info['video']['cover']['url_list'][0])
+            real_url = info['video']['play_addr']['url_list'][0]
+            video['url'].append(real_url.replace('playwm', 'play'))
+        else:
+            for img in info['images']:
+                video['pic'].append(img['url_list'][0])
+            video['url'] = video['pic']
+        video['music'] = info['music']['play_url']['uri']
         print(video)
         return video
 
@@ -45,6 +63,9 @@ class MainHandler(tornado.web.RequestHandler):
         url = self.get_argument('url')
         json = self.douyin(url)
         self.write(json)
+
+    def post(self):
+        self.get()
 
     def douyin(self, url):
         res = self.session.get(url)

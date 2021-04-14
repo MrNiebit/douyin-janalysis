@@ -39,11 +39,20 @@
         #content p {
             width: 220px;
         }
+        img {
+            width: 40%;
+        }
     </style>
 
 </head>
 <script>
     $(function() {
+        var baseUrl = "http://127.0.0.1:8888";
+        $.ajaxSetup({
+           beforeSend: (xhr, settings) => {
+               settings.url = baseUrl + settings.url;
+           }
+        });
         $('#btn').on('click', function() {
             let reg = /([http|https]*?:\/\/v\.douyin\.com\/[(?:s\/){0,1}|(share)]*(?:[0-9a-zA-Z?=&])+)(?:.+:(?:\s)*)?([a-zA-Z]{4})?/;
             let text = $('#url').val();
@@ -59,14 +68,25 @@
 
             $.ajax({
                 url: '/dy?url=' + url,
+                method: 'POST',
+                data: {'url': url},
                 success: function(data) {
                     console.log(data)
-                    $('#content').html(`
-                <a href="` + data.url + `" target="_blank">
-                <img src="` + data.pic + `">
-                <p>` + data.desc + `</p></a>
-                
-            `)
+                    let prefix = `
+                        <a href="` + data.url + `" target="_blank">`;
+                    let music = `
+                        背景音乐：<p><a href="` + data.music + `" target="_blank"> ` + data.music + ` </a></p>
+                    `;
+                    let suffix = `
+                                 <p>` + data.desc + `</p></a>`;
+                    
+                    var body = '';
+                    data.pic.forEach(pic => {
+                        body += `
+                        <img src="` + pic + `" /> </br>
+                        `
+                    });
+                    $('#content').html(prefix + body + suffix + music)
                 }
             })
         });
