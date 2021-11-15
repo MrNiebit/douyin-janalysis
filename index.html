@@ -77,6 +77,11 @@
                     //     <a href="` + data.url + `" target="_blank">`;
                     let music = `
                         背景音乐：<p><a href="` + data.music + `" target="_blank"> ` + data.music + ` </a></p>
+                        <p><audio controls="controls" autoplay="autoplay">
+                            <source src="` + data.music + `" type="audio/ogg" />
+                            <source src="` + data.music + `" type="audio/mpeg" />
+                            Your browser does not support the audio element.
+                            </audio></p>
                     `;
                     let suffix = `
                                  <a href="` + data.url[0] + `" target="_blank"><p>` + data.desc + `</p></a>`;
