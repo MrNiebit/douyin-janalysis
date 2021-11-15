@@ -33,12 +33,16 @@ class MainHandler(tornado.web.RequestHandler):
         self.finish()
 
     def get_video_id(self, url):
-        mid = url.split('/')[5]
+        strs = url.split("?")[0].split('/')
+        try:
+            mid = strs[5]
+        except:
+            mid = strs[4]
         print("mid ----> " + mid)
         return mid
 
     def get_video_info(self, mid):
-        json_data = requests.get(self.api_url % mid).json()
+        json_data = self.session.get(self.api_url % mid, headers=self.headers).json()
         print('api_url ---> ' + self.api_url % mid)
         info = json_data['item_list'][0]
         video = {}
